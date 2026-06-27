@@ -33,11 +33,18 @@
 
 Код агента **один и тот же** во всех фазах — меняется только клиент (`procurement_agents/llm.py`).
 
-## Три прототипа
+## Три прототипа (все работают: stub + local)
 
 1. **`spec`** — спецификация → оспаривание завышения (S1) + should-cost себестоимости.
-2. **`contract`** — договор → разбор рисков по CUAD + правки + провенанс *(следующий шаг)*.
-3. **`negotiation`** — контекст → рычаги, запасная позиция, цели, тезисы *(следующий шаг)*.
+2. **`contract`** — договор → риски по CUAD + правки + **валидатор провенанса R3** (режет выдуманные цитаты).
+3. **`negotiation`** — контекст → рычаги (Purchasing Chessboard) + **ценовая лестница от should-cost** + возражения + BATNA.
+
+```bash
+python cli.py spec        fixtures/spec_cable.txt          --provider stub
+python cli.py contract    fixtures/contract_sample.txt     --provider stub --party покупатель
+python cli.py negotiation fixtures/negotiation_context.txt --provider stub \
+    --category cable --current-price 1850 --should-cost 1561 --supplier-power medium
+```
 
 ## Запуск
 
