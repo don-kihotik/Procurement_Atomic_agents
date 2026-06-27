@@ -24,10 +24,11 @@ except Exception:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Procurement Atomic Agents")
-    ap.add_argument("agent", choices=["spec"], help="какой агент запустить")
+    ap.add_argument("agent", choices=["spec", "contract"], help="какой агент запустить")
     ap.add_argument("file", help="путь к входному документу (текст)")
     ap.add_argument("--provider", help="переопределить LLM_PROVIDER: local|stub|claude|yandex")
     ap.add_argument("--category", help="подсказка категории, напр. cable")
+    ap.add_argument("--party", default="покупатель", help="чью сторону защищаем (для contract)")
     args = ap.parse_args()
 
     if args.provider:
@@ -40,7 +41,11 @@ def main() -> int:
         from procurement_agents.agents.spec_shouldcost_agent import analyze_spec
         from procurement_agents.schemas.spec_shouldcost import SpecInput
         out = analyze_spec(SpecInput(raw_text=text, category_hint=args.category))
-        print(json.dumps(out.model_dump(), ensure_ascii=False, indent=2))
+    elif args.agent == "contract":
+        from procurement_agents.agents.contract_agent import analyze_contract
+        from procurement_agents.schemas.contract import ContractInput
+        out = analyze_contract(ContractInput(raw_text=text, party=args.party))
+    print(json.dumps(out.model_dump(), ensure_ascii=False, indent=2))
     return 0
 
 

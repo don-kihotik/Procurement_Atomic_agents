@@ -62,6 +62,21 @@ def compute_static(
     return out
 
 
+def guess_template(text: str, category: str | None = None) -> str | None:
+    """Детерминированный подбор BOM-шаблона по ключевым словам.
+
+    Страховка на случай, когда слабая модель не выбрала шаблон сама.
+    """
+    blob = f"{text} {category or ''}".lower()
+    if "кабел" in blob:
+        if any(k in blob for k in ("алюмин", "alumin", " al ", "ал.")):
+            return "cable_power_al"
+        if any(k in blob for k in ("медн", "медь", "copper", " cu")):
+            return "cable_power_cu"
+        return "cable_power_cu"
+    return None
+
+
 def build_should_cost(
     template_key: str,
     *,

@@ -11,7 +11,7 @@ import os
 
 from ..llm import get_client_and_model, structured_complete
 from ..core.data import BOM_TEMPLATES, norms_for
-from ..core.shouldcost import build_should_cost, ShouldCostError
+from ..core.shouldcost import build_should_cost, guess_template, ShouldCostError
 from ..schemas.spec_shouldcost import (
     SpecInput, SpecOutput, SpecLLMExtraction, SpecAttribute, GoldPlatingFlag, ShouldCost,
 )
@@ -94,8 +94,17 @@ def analyze_spec(inp: SpecInput) -> SpecOutput:
         )
         notes.append(f"LLM-шаг: провайдер '{os.getenv('LLM_PROVIDER')}', модель '{model}'.")
 
+    # если модель не выбрала валидный шаблон — подбираем эвристикой по тексту
+    template_key = extraction.bom_template
+    if template_key not in BOM_TEMPLATES:
+        guessed = guess_template(inp.raw_text, extraction.category)
+        if guessed:
+            template_key = guessed
+            extraction.bom_template = guessed
+            notes.append(f"BOM-шаблон подобран эвристикой ядра: '{guessed}'.")
+
     should_cost = None
-    if extraction.bom_template in BOM_TEMPLATES:
+    if template_key in BOM_TEMPLATES:
         try:
             sc = build_should_cost(
                 extraction.bom_template,
