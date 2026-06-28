@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Экономический разбор договора</h1>
+<p class="sub">{{ source }} · защищаем: {{ party }}</p>
+
+<div class="card" style="padding:16px 18px">
+  <div class="kpis">
+    <div class="kpi"><div class="k">Тип договора</div><div class="v" style="font-family:var(--font-sans);font-size:16px">{{ r.contract_type }}</div></div>
+    <div class="kpi"><div class="k">Модель</div><div class="v" style="font-size:15px">{{ r.model }}</div></div>
+    <div class="kpi bad"><div class="k">Красных (риск/деньги)</div><div class="v">{{ r.summary.red }}</div></div>
+    <div class="kpi bad"><div class="k">Высокий приоритет</div><div class="v">{{ r.summary.high }}</div></div>
+    <div class="kpi"><div class="k">Проверено пунктов</div><div class="v">{{ r.summary.total }}</div></div>
+  </div>
+  <div style="font-size:13px;color:var(--text-body);background:var(--warning-bg);border-radius:8px;padding:9px 12px">
+    <b>Денег на столе.</b> {{ r.money_note }}
+  </div>
+  <div class="legend">
+    <span><span class="tl red"></span>нет / риск</span>
+    <span><span class="tl yellow"></span>частично</span>
+    <span><span class="tl green"></span>есть</span>
+    <span><span class="tl missing"></span>в договоре нет</span>
+    <span><span class="tl na"></span>н/п</span>
+  </div>
+</div>
+
+<div class="panes">
+  <!-- ЛЕВО: дерево проверки -->
+  <div class="pane">
+    <h2>Дерево проверки · CUAD (экономическая линза)</h2>
+    {% for cl in r.clusters %}
+    <div class="cluster">
+      <div class="ch">{{ cl.name }}</div>
+      {% for it in cl.items %}
+      <details class="item" data-st="{{ it.status }}" {% if it.status=='RED' and it.severity=='high' %}open{% endif %}>
+        <summary>
+          <span class="tl {{ it.status|lower }}"></span>
+          <span class="lab">{{ it.label }}</span>
+          {% if it.economic %}<span class="sev {{ it.severity }}">{{ it.severity }}</span>{% endif %}
+          <span class="chev">▾</span>
+        </summary>
+        <div class="detail">
+          <div class="ln"><b>Вопрос.</b> {{ it.question }}</div>
+          {% if it.answer %}<div class="ln"><b>Ответ.</b> {{ it.answer }}{% if it.risk_bearer %} <span class="mono" style="color:var(--text-subtle)">· риск: {{ it.risk_bearer }}</span>{% endif %}</div>{% endif %}
+          {% if it.impact %}<div class="ln imp"><b>Эффект.</b> {{ it.impact }}</div>{% endif %}
+          {% if it.redline %}<div class="rl"><b>Рекомендация.</b> {{ it.redline }}</div>{% endif %}
+          {% if it.quote %}
+          <div class="ln q">«{{ it.quote }}»
+            {% if it.provenance_ok %}<span class="show" data-target="q-{{ it.key }}">показать в договоре →</span>{% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </details>
+      {% endfor %}
+    </div>
+    {% endfor %}
+
+    {% if r.rejected %}
+    <div class="rejected">
+      <div class="rh">Отброшено провенансом · {{ r.rejected|length }}</div>
+      {% for it in r.rejected %}
+      <div class="ri">«{{ it.quote }}» — цитаты нет в договоре, вероятная галлюцинация модели. Исключено из находок.</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ПРАВО: листалка договора -->
+  <div class="pane">
+    <h2>Текст договора</h2>
+    <div class="docwrap">{{ doc_html|safe }}</div>
+  </div>
+</div>
+
+<div class="foot">
+  <span>провайдер: {{ r.provider }} · {{ r.model }}</span>
+  <span>анализ: {{ elapsed }} c</span>
+  <span>провенанс R3: отброшено {{ r.summary.rejected }}</span>
+  <span>коммерческий анализ, не юридическая консультация</span>
+</div>
+<div style="margin-top:16px"><a class="btn ghost" href="/">← новый договор</a></div>
+{% endblock %}

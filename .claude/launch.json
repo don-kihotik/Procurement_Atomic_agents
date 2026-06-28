@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "contract-cockpit",
+      "runtimeExecutable": "C:/Users/alexe/code/Procurement_Atomic_agents/.venv/Scripts/python.exe",
+      "runtimeArgs": ["run_web.py", "--no-browser", "--host", "127.0.0.1", "--port", "8800"],
+      "port": 8800
+    }
+  ]
+}

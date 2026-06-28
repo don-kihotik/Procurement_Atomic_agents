@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Загрузите договор — получите экономический разбор</h1>
+<p class="sub">Где договор стоит покупателю денег и перекладывает риск. Не юридическая консультация — коммерческий анализ.</p>
+
+{% if error %}<div class="err">{{ error }}</div>{% endif %}
+
+<form class="card" method="post" action="/analyze" enctype="multipart/form-data">
+  <div class="drop">
+    <div style="font-size:14px">Перетащите договор или выберите файл</div>
+    <div class="hint">.pdf · .docx · .txt</div>
+    <input type="file" name="file" accept=".pdf,.docx,.txt">
+  </div>
+
+  <textarea name="pasted" placeholder="…либо вставьте текст договора сюда"></textarea>
+
+  <div class="row">
+    <div>
+      <label class="fl">Защищаем сторону</label>
+      <select name="party">
+        <option value="покупатель">Покупатель</option>
+        <option value="поставщик">Поставщик</option>
+      </select>
+    </div>
+    <div>
+      <label class="fl">Модель</label>
+      <select name="model">
+        {% for val, label in models %}<option value="{{ val }}">{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn" type="submit">Анализировать</button>
+    <button class="btn ghost" type="submit" name="use_sample" value="1">Загрузить пример</button>
+    <span class="spin mono" style="color:var(--text-muted)">идёт анализ…</span>
+  </div>
+  <div class="hint" style="margin-top:10px">Локальная модель на CPU считает десятки секунд. Для мгновенной демонстрации выберите «Пример».</div>
+</form>
+{% endblock %}

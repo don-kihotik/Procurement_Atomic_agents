@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}Аналитик договора{% endblock %}</title>
+<link rel="stylesheet" href="/static/cockpit.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span> Аналитик договора</div>
+    <span class="url">экономическая линза · localhost</span>
+  </div>
+  {% block content %}{% endblock %}
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>
